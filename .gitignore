@@ -1,0 +1,9 @@
+.DS_Store
+tex/
+**/node_modules/
+**/dist/
+**/coverage/
+**/.codegraph/
+**/.cursor/
+**/data/*.sqlite
+**/data/*.sqlite-*
