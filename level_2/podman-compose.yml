@@ -1,0 +1,15 @@
+services:
+  level-2:
+    build:
+      context: .
+      dockerfile: Containerfile
+    working_dir: /app
+    command: npm run dev
+    ports:
+      - "3001:3001"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      NODE_ENV: development
+      PORT: "3001"

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Level 1: Toroidal Crucible</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="toolbar" aria-label="Match controls">
+        <div class="brand">
+          <h1>Level 1: Toroidal Crucible</h1>
+          <p>Multi-color Langton tournament</p>
+        </div>
+
+        <div class="control-group" role="group" aria-label="Color count">
+          <button class="segmented active" data-n="2">2</button>
+          <button class="segmented" data-n="3">3</button>
+          <button class="segmented" data-n="4">4</button>
+        </div>
+
+        <div class="control-group mode-group" role="group" aria-label="View mode">
+          <button class="segmented active" data-mode="match">Match</button>
+          <button class="segmented" data-mode="custom">Custom</button>
+          <button class="segmented" data-mode="solo">Solo</button>
+        </div>
+
+        <select id="winnerRule" class="select-rule" aria-label="Preset rule"></select>
+        <input id="customRuleA" class="rule-input" type="text" aria-label="Rule A or solo rule" placeholder="Rule A / Solo" />
+        <input id="customRuleB" class="rule-input" type="text" aria-label="Custom rule B" placeholder="Rule B" />
+        <button id="newMatch" class="command" type="button">New Match</button>
+        <button id="playPause" class="command" type="button">Pause</button>
+        <label class="checkbox-label">
+          <input id="noLimitSteps" type="checkbox" />
+          No limit
+        </label>
+
+        <label class="slider-label">
+          Speed
+          <input id="speed" type="range" min="1" max="10" value="5" />
+        </label>
+      </section>
+
+      <section class="arena">
+        <canvas id="grid" width="768" height="768" aria-label="Toroidal grid visualization"></canvas>
+        <aside class="stats" aria-label="Match stats">
+          <dl>
+            <dt>Rule A</dt>
+            <dd id="ruleA">-</dd>
+            <dt>Rule B</dt>
+            <dd id="ruleB">-</dd>
+            <dt>Frame</dt>
+            <dd id="frame">-</dd>
+            <dt>Active</dt>
+            <dd id="active">-</dd>
+            <dt>Biomass</dt>
+            <dd id="biomass">-</dd>
+            <dt>Winner</dt>
+            <dd id="winner">-</dd>
+          </dl>
+        </aside>
+      </section>
+    </main>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

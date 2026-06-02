@@ -1,0 +1,17 @@
+services:
+  level-1:
+    build:
+      context: .
+      dockerfile: Containerfile
+    working_dir: /app
+    command: npm run dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      NODE_ENV: development
+      NODE_OPTIONS: --experimental-sqlite
+      PORT: "3000"
+      DB_PATH: /app/data/lifechess.sqlite
