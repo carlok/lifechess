@@ -63,9 +63,7 @@ const DEFAULT_PULSE_STEPS = 16_384;
 const DEFAULT_MACRO_TURNS = [0, 1, 0, 1];
 
 export function wrap(value: number, limit: number): number {
-  if (value < 0) return limit - 1;
-  if (value >= limit) return 0;
-  return value;
+  return ((value % limit) + limit) % limit;
 }
 
 function cloneAnt(ant: AntState): AntState {
@@ -113,8 +111,6 @@ function mergeAnt(base: AntState, override?: Partial<AntState>): AntState {
   if (override?.coreY !== undefined && override.y === undefined) {
     ant.y = override.coreY;
   }
-  ant.x = wrap(ant.x, Number.MAX_SAFE_INTEGER);
-  ant.y = wrap(ant.y, Number.MAX_SAFE_INTEGER);
   ant.dir = ((ant.dir % 4) + 4) % 4;
   return ant;
 }

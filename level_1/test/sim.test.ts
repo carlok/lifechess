@@ -8,6 +8,13 @@ describe("simulation", () => {
     expect(wrap(4, 8)).toBe(4);
   });
 
+  it("wraps multi-lap coordinates onto the torus", () => {
+    expect(wrap(9, 8)).toBe(1);
+    expect(wrap(17, 8)).toBe(1);
+    expect(wrap(-9, 8)).toBe(7);
+    expect(wrap(-17, 8)).toBe(7);
+  });
+
   it("updates ownership when cells are written", () => {
     const result = simulateMatch("0R_0R", "0R_0R", 2, {
       width: 8,
@@ -72,6 +79,19 @@ describe("simulation", () => {
     expect(initial?.antB).toMatchObject({ coreX: 4, coreY: 3, dir: 3 });
   });
 
+  it("normalizes custom spawn coordinates with full toroidal wrapping", () => {
+    const result = simulateMatch("0R_0R", "0R_0R", 2, {
+      width: 8,
+      height: 8,
+      pulseSteps: 0,
+      includeFrames: true,
+      spawnA: { x: 17, y: -9, coreX: 17, coreY: -9 },
+      spawnB: { x: 0, y: 0, coreX: 0, coreY: 0 }
+    });
+
+    expect(result.frames?.[0].antA).toMatchObject({ x: 1, y: 7, coreX: 1, coreY: 7 });
+  });
+
   it("renders a single rule shape without an opponent", () => {
     const result = simulateSoloRule("1R_0L", 2, {
       width: 16,
@@ -97,7 +117,7 @@ describe("simulation", () => {
       pulseSteps: 5,
       includeFrames: true,
       frameEvery: 1,
-      spawnA: { coreX: 8, coreY: 8, dir: 1 }
+      spawnA: { x: 8, y: 8, coreX: 8, coreY: 8, dir: 1 }
     }, 2);
 
     expect(result.totalSteps).toBe(10);
