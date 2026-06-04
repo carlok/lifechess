@@ -43,7 +43,58 @@ describe("level 2 API", () => {
     expect(actionBody.game.activePlayer).toBe(1);
     expect(actionBody.frames.length).toBeGreaterThan(0);
   });
+
+  it("rejects malformed game actions with a stable error", async () => {
+    const baseUrl = await startTestServer();
+    const gameId = await createGame(baseUrl);
+
+    const actionResponse = await fetch(`${baseUrl}/api/game/action`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        gameId,
+        action: { pieceId: "A1" }
+      })
+    });
+
+    expect(actionResponse.status).toBe(400);
+    const actionBody = await actionResponse.json() as { error: string };
+    expect(actionBody.error).toBe("Action type must be deploy or activate");
+  });
+
+  it("rejects deploy actions with missing coordinates before engine dispatch", async () => {
+    const baseUrl = await startTestServer();
+    const gameId = await createGame(baseUrl);
+
+    const actionResponse = await fetch(`${baseUrl}/api/game/action`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        gameId,
+        action: { type: "deploy", pieceId: "A1", dir: 1 }
+      })
+    });
+
+    expect(actionResponse.status).toBe(400);
+    const actionBody = await actionResponse.json() as { error: string };
+    expect(actionBody.error).toBe("Deploy action requires integer x and y coordinates");
+  });
 });
+
+async function createGame(baseUrl: string): Promise<string> {
+  const response = await fetch(`${baseUrl}/api/game/new`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      rosterA: ["a", "a", "b", "c"],
+      rosterB: ["d", "c", "b", "a"],
+      options: { width: 32, height: 32, pulseSteps: 8, frameEvery: 4 }
+    })
+  });
+  expect(response.ok).toBe(true);
+  const body = await response.json() as { game: { id: string } };
+  return body.game.id;
+}
 
 async function startTestServer(): Promise<string> {
   const app = createApp(new GameStore());
