@@ -1,5 +1,14 @@
 import express from "express";
-import { applyAction, createGame, serializeGame, type GameAction, type GameOptions, type GameState } from "./game.js";
+import {
+  applyAction,
+  createGame,
+  serializeGame,
+  type DeployAction,
+  type Direction,
+  type GameAction,
+  type GameOptions,
+  type GameState
+} from "./game.js";
 import { PIECES } from "./rules.js";
 
 export class GameStore {
@@ -42,7 +51,7 @@ export function createApp(store = new GameStore()): express.Express {
   app.post("/api/game/action", (request, response) => {
     try {
       const game = store.get(request.body?.gameId);
-      const result = applyAction(game, request.body?.action as GameAction);
+      const result = applyAction(game, parseAction(request.body?.action));
       response.json(result);
     } catch (error) {
       sendError(response, error);
@@ -67,6 +76,47 @@ function clampNumber(value: unknown, min: number, max: number, fallback: number)
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) return fallback;
   return Math.max(min, Math.min(max, Math.floor(parsed)));
+}
+
+function parseAction(input: unknown): GameAction {
+  if (typeof input !== "object" || input === null) {
+    throw new Error("Action must be an object");
+  }
+
+  const action = input as Record<string, unknown>;
+  if (action.type !== "deploy" && action.type !== "activate") {
+    throw new Error("Action type must be deploy or activate");
+  }
+  if (typeof action.pieceId !== "string" || action.pieceId.length === 0) {
+    throw new Error("Action must include a pieceId");
+  }
+
+  if (action.type === "activate") {
+    return { type: "activate", pieceId: action.pieceId };
+  }
+
+  const x = action.x;
+  const y = action.y;
+  const dir = action.dir;
+  if (
+    typeof x !== "number" ||
+    typeof y !== "number" ||
+    !Number.isInteger(x) ||
+    !Number.isInteger(y)
+  ) {
+    throw new Error("Deploy action requires integer x and y coordinates");
+  }
+  if (typeof dir !== "number" || !Number.isInteger(dir) || dir < 0 || dir > 3) {
+    throw new Error("Deploy action direction must be 0, 1, 2, or 3");
+  }
+
+  return {
+    type: "deploy",
+    pieceId: action.pieceId,
+    x,
+    y,
+    dir: dir as Direction
+  } satisfies DeployAction;
 }
 
 function sendError(response: express.Response, error: unknown): void {
